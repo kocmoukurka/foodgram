@@ -1,7 +1,3 @@
-frontend/node_modules
-infra/frontend/build
-.env
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -30,6 +26,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+docker-compose.yml
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -108,8 +105,6 @@ celerybeat.pid
 # Environments
 .env
 .venv
-.venv/
-.env/
 env/
 venv/
 ENV/
@@ -134,9 +129,25 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# .idea
+# Папки, создаваемые средой разработки
 .idea
-.vscode
+.DS_Store
+.AppleDouble
+.LSOverride
 
-static/
+*.sublime-project
+*.sublime-workspace
+
+.vscode/
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+.mypy_cache
+
+# папки со статикой и медиа
 media/
+
+# Others
+node_modules

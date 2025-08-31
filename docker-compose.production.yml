@@ -1,0 +1,40 @@
+# docker-compose.yml
+version: '1'
+
+volumes:
+  pg_data:
+  static:
+  media:
+
+services:
+  db:
+    image: postgres:14
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  backend:
+    image: kosmoukurka/foodgram_backend
+    env_file: .env
+    volumes:
+      - static:/backend_static
+      - media:/backend_media
+    depends_on:
+      - db
+
+  frontend:
+    image: kosmoukurka/foodgram_frontend
+    command: cp -r /app/build/. /frontend_static/
+    volumes:
+      - static:/frontend_static
+
+  gateway:
+    image: kosmoukurka/foodgram_nginx
+    volumes:
+      - media:/media
+      - static:/staticfiles
+      - ./docs/:/usr/share/nginx/html/api/docs/
+    ports:
+      - 9000:80
+    depends_on:
+      - backend
+      - frontend
