@@ -1,3 +1,4 @@
+![example workflow](https://github.com/kocmoukurka/foodgram/actions/workflows/main.yml/badge.svg)
 # Foodgram 
 
 Социальная сеть для обмена рецептами блюд.
