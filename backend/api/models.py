@@ -152,8 +152,8 @@ class IngredientInRecipe(models.Model):
 
     def __str__(self):
         """Строковое представление экземпляра."""
-        return f'Рецепт "{self.recipe}" включает {
-            self.amount} ед. "{self.ingredient}"'
+        return f'Рецепт "{self.recipe}" включает {self.amount} ед. "{
+            self.ingredient}"'
 
 
 class Favorite(models.Model):

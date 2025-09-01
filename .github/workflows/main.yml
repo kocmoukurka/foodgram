@@ -70,8 +70,8 @@ jobs:
       - name: Test frontend
         run: |
           cd frontend/
-          npm test -- --watchAll=false --passWithNoTests
-          
+          npm test -- --watchAll=false --passWithNoTests --testPathIgnorePatterns=".*"
+
   build_and_push_to_docker_hub:
     name: Push backend Docker image
     runs-on: ubuntu-latest

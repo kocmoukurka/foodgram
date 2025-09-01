@@ -60,13 +60,10 @@ class GenerateLinkMixin:
         """
         Простой и эффективный генератор коротких ссылок.
         """
-        # Используем SECRET_KEY для уникальности
         data = f"{settings.SECRET_KEY}{recipe_id}".encode()
 
-        # Создаем хеш и берем первые 6 байт
         hash_bytes = hashlib.sha256(data).digest()[:6]
 
-        # Кодируем в base64 без padding
         short_code = base64.urlsafe_b64encode(hash_bytes).decode().rstrip('=')
 
         Recipe.objects.filter(pk=recipe_id).update(short_link_code=short_code)
