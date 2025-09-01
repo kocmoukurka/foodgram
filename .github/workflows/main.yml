@@ -40,7 +40,7 @@ jobs:
           python -m pip install --upgrade pip setuptools
           pip install flake8==6.0.0 flake8-isort==6.0.0
           pip install -r ./backend/requirements.txt
-      - name: Test with flake8
+      - name: Test with flake8 and django tests
         env:
           POSTGRES_USER: django_user
           POSTGRES_PASSWORD: django_password
@@ -53,6 +53,7 @@ jobs:
         run: |          
           cd backend/
           python -m flake8
+          python manage.py test
 
   frontend_tests:
     runs-on: ubuntu-latest
