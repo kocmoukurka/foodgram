@@ -70,8 +70,8 @@ jobs:
       - name: Test frontend
         run: |
           cd frontend/
-          node --no-warnings node_modules/.bin/react-scripts test --watchAll=false --passWithNoTests
-
+          npm test -- --watchAll=false --passWithNoTests
+          
   build_and_push_to_docker_hub:
     name: Push backend Docker image
     runs-on: ubuntu-latest
