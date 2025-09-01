@@ -14,3 +14,4 @@ exclude =
     env/
 per-file-ignores =
   settings.py:E501
+extend-ignore = I001, I003, I005
