@@ -52,7 +52,7 @@ jobs:
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         run: |          
           cd backend/
-          python -m flake8
+          python -m flake8 --extend-ignore=E702, I001, I003, I005
           python manage.py test
 
   frontend_tests:

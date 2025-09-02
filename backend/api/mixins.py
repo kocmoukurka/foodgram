@@ -97,7 +97,9 @@ class DownloadFileMixin:
         """
         response = HttpResponse(content_type='text/plain; charset=utf-8')
         response['Content-Disposition'] = (
-            f'attachment; filename="shopping_list_{user.username}.txt"',
+            f'attachment; filename="'
+            f'shopping_list_{user.username}'
+            f'.txt"'
         )
         lines = [
             'Список покупок:',
