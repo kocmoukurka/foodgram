@@ -96,9 +96,11 @@ class DownloadFileMixin:
         :return: HTTP-ответ с файлом
         """
         response = HttpResponse(content_type='text/plain; charset=utf-8')
-        response['Content-Disposition'] = (f'attachment; filename="'
-                                           f'shopping_list_{user.username}'
-                                           f'.txt"')
+        response['Content-Disposition'] = (
+            f'attachment; filename="'
+            f'shopping_list_{user.username}'
+            f'.txt"'
+        )
         lines = [
             'Список покупок:',
             '\n',
