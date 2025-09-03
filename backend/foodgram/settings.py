@@ -140,3 +140,7 @@ DJOSER = {
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = '/backend_send_emails/send_emails'
 DEFAULT_FROM_EMAIL = 'yamdb@example.com'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://onov.ddns.net'
+]
