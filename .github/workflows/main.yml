@@ -149,6 +149,11 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            mkdir -p foodgram
+            sudo chown -R $USER:$USER foodgram
+            sudo chmod -R 755 foodgram
+            ls -la foodgram/
           source: "docker-compose.production.yml"
           target: "foodgram"
           overwrite: true
