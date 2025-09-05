@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from users.constants import (
@@ -46,7 +47,13 @@ class User(AbstractUser):
         help_text='Загрузите изображение профиля'
     )
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ('username',)
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+
+    def clean(self):
+        if not self.first_name:
+            raise ValidationError('Имя обязательно для заполнения')
+        if not self.last_name:
+            raise ValidationError('Фамилия обязательна для заполнения')
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -80,6 +87,20 @@ class Subscribe(models.Model):
         related_name='subscribers',
         verbose_name='На кого подписался'
     )
+
+    def clean(self):
+        # Проверяем, что пользователь не пытается подписаться на самого себя
+        if self.user == self.following:
+            raise ValidationError('Нельзя подписаться на самого себя')
+
+        # Дополнительная проверка: нельзя подписаться дважды
+        if Subscribe.objects.filter(user=self.user,
+                                    following=self.following).exists():
+            raise ValidationError('Вы уже подписаны на этого пользователя')
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Подписка'

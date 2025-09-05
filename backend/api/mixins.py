@@ -6,7 +6,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Recipe
+from recipes.models import Recipe
 
 
 class AddRemoveObjectMixin:

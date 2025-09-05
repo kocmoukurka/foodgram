@@ -6,7 +6,7 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from users.models import Subscribe
-from .models import (
+from recipes.models import (
     Recipe,
     Tag,
     Ingredient,

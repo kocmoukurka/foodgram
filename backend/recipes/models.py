@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from .constants import (
@@ -98,6 +99,12 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Теги',
     )
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        through='IngredientInRecipe',
+        related_name='recipes',
+        verbose_name='Ингредиенты',
+    )
     created = models.DateTimeField(
         'Дата создания',
         auto_now_add=True,
@@ -111,6 +118,15 @@ class Recipe(models.Model):
         unique=True,
         help_text='Уникальный короткий код ссылки.',
     )
+
+    def clean(self):
+        if self.cooking_time < 1:
+            raise ValidationError(
+                'Время готовки должно быть не менее 1 минуты')
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -138,6 +154,10 @@ class IngredientInRecipe(models.Model):
         verbose_name='Ингредиент',
     )
     amount = models.PositiveIntegerField('Количество')
+
+    def clean(self):
+        if self.amount < 1:
+            raise ValidationError('Количество должно быть не менее 1')
 
     class Meta:
         constraints = [

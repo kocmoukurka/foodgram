@@ -61,7 +61,7 @@ Foodgram - это fullstack-приложение, позволяющее:
    sudo docker compose -f docker-compose.production.yml up -d
    sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate # При первом запуске
    sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic # При первом запуске
-   sudo docker compose -f docker-compose.production.yml exec backend python manage.py loaddata ingredients # При первом запуске
+   sudo docker compose -f docker-compose.production.yml exec backend python manage.py load_ingredients # При первом запуске
 ```
 ## APi
 - Api документация доступна по адресу 

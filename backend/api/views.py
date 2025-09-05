@@ -19,7 +19,7 @@ from rest_framework.viewsets import (
 from rest_framework import status
 
 from users.models import Subscribe
-from .models import (
+from recipes.models import (
     Recipe,
     Ingredient,
     Tag,
@@ -38,7 +38,7 @@ from .serializers import (
     FavoriteSerializer,
     ShoppingCartSerializer,
 )
-from .filters import RecipeFilter
+from .filters import IngredientFilter, RecipeFilter
 from .pagination import Pagination
 from .permissions import IsAuthorOrReadOnly
 from .mixins import AddRemoveObjectMixin, GenerateLinkMixin, DownloadFileMixin
@@ -143,17 +143,8 @@ class RecipeViewSet(
 class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = (AllowAny,)
+    filterset_class = IngredientFilter
     pagination_class = None
-
-    def get_queryset(self):
-        name = self.request.query_params.get('name')
-        if name:
-            name = name.strip()
-            queryset = Ingredient.objects.filter(name__istartswith=name)
-        else:
-            queryset = Ingredient.objects.all()
-        return queryset
 
 
 class TagViewSet(ReadOnlyModelViewSet):

@@ -1,6 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.models import Group
-from .models import (
+from django.core.exceptions import ValidationError
+from recipes.models import (
     Tag,
     Ingredient,
     Recipe,
@@ -10,6 +11,12 @@ from .models import (
 )
 
 admin.site.unregister(Group)
+
+
+class IngredientInRecipeInline(admin.TabularInline):
+    model = IngredientInRecipe
+    extra = 1
+    autocomplete_fields = ('ingredient',)
 
 
 @admin.register(Tag)
@@ -34,11 +41,19 @@ class RecipeAdmin(admin.ModelAdmin):
     date_hierarchy = 'created'
     empty_value_display = '-пусто-'
     autocomplete_fields = ('author', 'tags')
+    inlines = (IngredientInRecipeInline,)
 
     def get_favorites_count(self, obj):
         return obj.favorites.count()
     get_favorites_count.short_description = 'В избранном'
     get_favorites_count.admin_order_field = 'favorites__count'
+
+    def save_model(self, request, obj, form, change):
+        try:
+            obj.clean()
+            super().save_model(request, obj, form, change)
+        except ValidationError as e:
+            self.message_user(request, str(e), level=messages.ERROR)
 
 
 @admin.register(IngredientInRecipe)
