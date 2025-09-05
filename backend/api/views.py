@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.db.models import Count, Sum
 from django_filters.rest_framework import DjangoFilterBackend
-from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
