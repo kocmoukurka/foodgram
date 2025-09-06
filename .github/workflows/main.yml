@@ -140,6 +140,25 @@ jobs:
       - build_frontend_and_push_to_docker_hub
       - build_nginx_and_push_to_docker_hub
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Verify docker-compose file exists
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          echo "=== Files in root ==="
+          ls -la
+          echo "=== Docker-compose file content ==="
+          cat docker-compose.production.yml || echo "File not found!"
+          # Проверяем что файл существует
+          if [ ! -f "docker-compose.production.yml" ]; then
+            echo "❌ ERROR: docker-compose.production.yml not found!"
+            exit 1
+          fi
+
       - name: Copy docker-compose.yml via ssh
         uses: appleboy/scp-action@master
         with:
