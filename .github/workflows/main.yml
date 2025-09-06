@@ -147,15 +147,15 @@ jobs:
 
       - name: Verify docker-compose file exists
         run: |
-          echo "=== Current directory ==="
+          echo "=== Текущий каталог ==="
           pwd
-          echo "=== Files in root ==="
+          echo "=== Файлы в корневом каталоге ==="
           ls -la
-          echo "=== Docker-compose file content ==="
-          cat docker-compose.production.yml || echo "File not found!"
+          echo "=== Docker-compose содержимое файла ==="
+          cat docker-compose.production.yml || echo "Файл не найден!"
           # Проверяем что файл существует
           if [ ! -f "docker-compose.production.yml" ]; then
-            echo "❌ ERROR: docker-compose.production.yml not found!"
+            echo "ERROR: docker-compose.production.yml не найден!"
             exit 1
           fi
 
@@ -183,7 +183,7 @@ jobs:
             sudo docker compose -f docker-compose.production.yml up -d
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py loaddata ingredients
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py load_ingredients
 
   send_message:
     runs-on: ubuntu-latest
