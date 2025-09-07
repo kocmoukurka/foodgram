@@ -65,7 +65,7 @@ Foodgram - это fullstack-приложение, позволяющее:
 ```
 ## APi
 - Api документация доступна по адресу 
-- ваш_url//api/docs/
+- ваш_url/api/docs/
 
 # Автор
 GitHub: @kocmoukurka
