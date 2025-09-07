@@ -24,12 +24,15 @@ class RecipeFilter(django_filters.FilterSet):
 
     def filter_tags(self, queryset, name, value):
         """
-        Фильтрация рецептов по указанным тэгам.
+        Фильтрация по slug тегов
         """
-        tags_values = self.request.query_params.getlist(
-            'tags') if hasattr(self, 'request') else []
+        tags_values = self.request.GET.getlist('tags') if hasattr(
+            self, 'request') else []
         if tags_values:
-            return queryset.filter(tags__id__in=tags_values).distinct()
+            # Преобразуем названия в slug (если нужно)
+            slug_values = [tag.lower().replace(
+                ' ', '-') for tag in tags_values]
+            return queryset.filter(tags__slug__in=slug_values).distinct()
         return queryset
 
     def filter_is_favorited(self, queryset, name, value):
