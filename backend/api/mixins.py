@@ -1,12 +1,6 @@
-import hashlib
-import base64
-
 from django.http import HttpResponse
-from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
-
-from recipes.models import Recipe
 
 
 class AddRemoveObjectMixin:
@@ -49,26 +43,6 @@ class AddRemoveObjectMixin:
             )
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class GenerateLinkMixin:
-    """
-    Миксин для генерации коротких ссылок.
-    """
-
-    def generate_short_code(self, recipe_id):
-        """
-        Простой и эффективный генератор коротких ссылок.
-        """
-        data = f"{settings.SECRET_KEY}{recipe_id}".encode()
-
-        hash_bytes = hashlib.sha256(data).digest()[:6]
-
-        short_code = base64.urlsafe_b64encode(hash_bytes).decode().rstrip('=')
-
-        Recipe.objects.filter(pk=recipe_id).update(short_link_code=short_code)
-
-        return short_code
 
 
 class DownloadFileMixin:

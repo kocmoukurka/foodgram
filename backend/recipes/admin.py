@@ -1,4 +1,5 @@
-from django.contrib import admin, messages
+from django.forms import BaseInlineFormSet
+from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from recipes.models import (
@@ -13,17 +14,47 @@ from recipes.models import (
 admin.site.unregister(Group)
 
 
+class IngredientInRecipeInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+
+        has_valid_ingredients = False
+        valid_forms_count = 0
+
+        for form in self.forms:
+            if form.cleaned_data and not form.cleaned_data.get('DELETE',
+                                                               False):
+                amount = form.cleaned_data.get('amount', 0)
+                ingredient = form.cleaned_data.get('ingredient')
+
+                if amount > 0 and ingredient is not None:
+                    has_valid_ingredients = True
+                    valid_forms_count += 1
+
+        if not has_valid_ingredients:
+            raise ValidationError(
+                'Рецепт должен содержать хотя бы один ингредиент.'
+            )
+
+        if valid_forms_count == 0:
+            raise ValidationError(
+                'Добавьте хотя бы один ингредиент с количеством больше 0.'
+            )
+
+
 class IngredientInRecipeInline(admin.TabularInline):
     model = IngredientInRecipe
     extra = 1
+    min_num = 1
     autocomplete_fields = ('ingredient',)
+    formset = IngredientInRecipeInlineFormSet
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     search_fields = ('name', )
-    prepopulated_fields = {"slug": ("name",)}
+    prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(Ingredient)
@@ -41,6 +72,7 @@ class RecipeAdmin(admin.ModelAdmin):
     date_hierarchy = 'created'
     empty_value_display = '-пусто-'
     autocomplete_fields = ('author', 'tags')
+    exclude = ('short_link_code',)
     inlines = (IngredientInRecipeInline,)
 
     def get_favorites_count(self, obj):
@@ -48,12 +80,11 @@ class RecipeAdmin(admin.ModelAdmin):
     get_favorites_count.short_description = 'В избранном'
     get_favorites_count.admin_order_field = 'favorites__count'
 
-    def save_model(self, request, obj, form, change):
-        try:
-            obj.clean()
-            super().save_model(request, obj, form, change)
-        except ValidationError as e:
-            self.message_user(request, str(e), level=messages.ERROR)
+    def get_readonly_fields(self, request, obj=None):
+        # Запрещаем изменение ID короткого линка после создания
+        if obj:
+            return ('id', 'created', 'short_link_code')
+        return ()
 
 
 @admin.register(IngredientInRecipe)

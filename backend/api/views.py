@@ -41,7 +41,7 @@ from .serializers import (
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import Pagination
 from .permissions import IsAuthorOrReadOnly
-from .mixins import AddRemoveObjectMixin, GenerateLinkMixin, DownloadFileMixin
+from .mixins import AddRemoveObjectMixin, DownloadFileMixin
 
 User = get_user_model()
 
@@ -64,7 +64,6 @@ def redirect_short_link(request, short_code):
 
 
 class RecipeViewSet(
-    GenerateLinkMixin,
     DownloadFileMixin,
     AddRemoveObjectMixin,
     ModelViewSet
@@ -94,10 +93,8 @@ class RecipeViewSet(
 
     @action(detail=True, methods=['get'], url_path='get-link')
     def get_short_link(self, request, pk=None):
-        recipe = self.get_object()
-        short_code = self.generate_short_code(recipe.id)
-        base_url = request.build_absolute_uri('/')[:-1]
-        short_link = f'{base_url}/s/{short_code}'
+        base_url = request.build_absolute_uri('/')
+        short_link = f'{base_url}s/{self.get_object().short_link_code}'
         return Response({'short-link': short_link})
 
     @action(methods=['post', 'delete'], detail=True, url_path='shopping_cart',

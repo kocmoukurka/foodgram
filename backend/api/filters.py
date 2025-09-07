@@ -25,13 +25,11 @@ class RecipeFilter(django_filters.FilterSet):
     def filter_tags(self, queryset, name, value):
         """
         Фильтрация рецептов по указанным тэгам.
-        Параметр передается как список через GET-запрос.
-        Примеры: /recipes/?tags=soup&tags=main_course
         """
-        tags_values = self.data.getlist('tags') if hasattr(
-            self, 'data') else []
+        tags_values = self.request.query_params.getlist(
+            'tags') if hasattr(self, 'request') else []
         if tags_values:
-            return queryset.filter(tags__slug__in=tags_values).distinct()
+            return queryset.filter(tags__id__in=tags_values).distinct()
         return queryset
 
     def filter_is_favorited(self, queryset, name, value):

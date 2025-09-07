@@ -1,5 +1,8 @@
+import hashlib
+import base64
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from .constants import (
@@ -92,6 +95,7 @@ class Recipe(models.Model):
     text = models.TextField('Описание', help_text='Описание рецепта.')
     cooking_time = models.PositiveIntegerField(
         'Время приготовления',
+        validators=(MinValueValidator(1),),
         help_text='Продолжительность готовки в минутах.',
     )
     tags = models.ManyToManyField(
@@ -119,14 +123,17 @@ class Recipe(models.Model):
         help_text='Уникальный короткий код ссылки.',
     )
 
-    def clean(self):
-        if self.cooking_time < 1:
-            raise ValidationError(
-                'Время готовки должно быть не менее 1 минуты')
+    def generate_short_link_code(self):
+        """
+        Генерирует уникальный короткий код для рецепта.
+        """
+        raw_data = f"{settings.SECRET_KEY}{self.id}".encode()
+        hashed_data = hashlib.sha256(raw_data).digest()
+        short_code = base64.urlsafe_b64encode(
+            hashed_data[:6]
+        ).decode().replace('=', '')
 
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
+        return short_code
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -153,11 +160,10 @@ class IngredientInRecipe(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Ингредиент',
     )
-    amount = models.PositiveIntegerField('Количество')
-
-    def clean(self):
-        if self.amount < 1:
-            raise ValidationError('Количество должно быть не менее 1')
+    amount = models.PositiveIntegerField(
+        'Количество',
+        validators=(MinValueValidator(1),),
+    )
 
     class Meta:
         constraints = [
