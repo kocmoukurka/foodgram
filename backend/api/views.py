@@ -72,7 +72,7 @@ class RecipeViewSet(
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     pagination_class = Pagination
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly)
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
