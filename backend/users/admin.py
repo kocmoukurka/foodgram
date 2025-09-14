@@ -14,16 +14,23 @@ class UserAdmin(BaseUserAdmin):
         'email',
         'first_name',
         'last_name',
+        'recipes_count',
+        'subscribers_count',
     )
     search_fields = ('username', 'email', 'first_name', 'last_name',)
+
+    @admin.display(description='Рецептов')
+    def recipes_count(self, obj):
+        return obj.recipes.count()
+
+    @admin.display(description='Подписчиков')
+    def subscribers_count(self, obj):
+        return obj.subscriptions.count()
 
 
 @admin.register(Subscribe)
 class SubscribeAdmin(admin.ModelAdmin):
-    list_display = (
-        'user',
-        'following',
-    )
-    search_fields = ('user__username', 'following__username',)
-    list_filter = ('user', 'following',)
+    list_display = ('user', 'author',)
+    search_fields = ('user__username', 'author__username',)
+    list_filter = ('user', 'author',)
     ordering = ('user',)

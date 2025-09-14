@@ -53,6 +53,7 @@ Foodgram - это fullstack-приложение, позволяющее:
 - DB_PORT=5432
 - SECRET_KEY=SECRET_KEY django
 - DEBUG=False django
+- CHOICE_DB=False django
 - ALLOWED_HOSTS=ALLOWED_HOSTS django
 - FRONTEND_URL= URl вашего сайта
 

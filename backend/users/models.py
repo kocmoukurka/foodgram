@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from users.constants import (
@@ -14,6 +13,8 @@ from users.validators import username_validator
 class User(AbstractUser):
     """Кастомная модель пользователя."""
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
     username = models.CharField(
         verbose_name='Логин',
         max_length=MAX_USERNAME_LENGTH,
@@ -33,12 +34,10 @@ class User(AbstractUser):
     first_name = models.CharField(
         verbose_name='Имя',
         max_length=MAX_FIRSTNAME_LENGTH,
-        blank=False,
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
         max_length=MAX_LASTNAME_LENGTH,
-        blank=False,
     )
     avatar = models.ImageField(
         blank=True,
@@ -46,72 +45,40 @@ class User(AbstractUser):
         verbose_name='Аватар',
         help_text='Загрузите изображение профиля'
     )
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
-
-    def clean(self):
-        if not self.first_name:
-            raise ValidationError('Имя обязательно для заполнения')
-        if not self.last_name:
-            raise ValidationError('Фамилия обязательна для заполнения')
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ('id',)
+        ordering = ('username',)
 
     def __str__(self):
         return self.username
-
-    @property
-    def subscribers(self):
-        """Пользователи, которые подписаны на этого пользователя"""
-        return User.objects.filter(subscriptions__following=self)
-
-    @property
-    def subscriptions(self):
-        """Пользователи, на которых подписан этот пользователь"""
-        return User.objects.filter(subscribers__user=self)
 
 
 class Subscribe(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subscriptions',
+        related_name='subscribers',
         verbose_name='Кто подписался'
     )
-    following = models.ForeignKey(
+    author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subscribers',
+        related_name='subscriptions',
         verbose_name='На кого подписался'
     )
-
-    def clean(self):
-        # Проверяем, что пользователь не пытается подписаться на самого себя
-        if self.user == self.following:
-            raise ValidationError('Нельзя подписаться на самого себя')
-
-        # Дополнительная проверка: нельзя подписаться дважды
-        if Subscribe.objects.filter(user=self.user,
-                                    following=self.following).exists():
-            raise ValidationError('Вы уже подписаны на этого пользователя')
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
         constraints = (
             models.UniqueConstraint(
-                fields=('user', 'following'),
+                fields=('user', 'author'),
                 name='unique_follow'
             ),
         )
         ordering = ('user',)
 
     def __str__(self):
-        return f'{self.user} подписался на {self.following}'
+        return f'{self.user} подписался на {self.author}'

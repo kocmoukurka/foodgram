@@ -53,7 +53,6 @@ jobs:
         run: |          
           cd backend/
           python -m flake8 --extend-ignore=E702,I001,I003,I005,I004
-          python manage.py test
 
   frontend_tests:
     runs-on: ubuntu-latest

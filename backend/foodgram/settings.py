@@ -13,8 +13,6 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:9000')
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -28,7 +26,7 @@ INSTALLED_APPS = [
     'djoser',
     'api',
     'users',
-    'recipes'
+    'recipes',
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -64,7 +62,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-if DEBUG:
+if os.getenv('CHOICE_DB', 'False').lower() == 'true':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -134,7 +132,6 @@ DJOSER = {
     'USER_ID_FIELD': 'id',
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
-        'user_create': 'api.serializers.UserCreateSerializer',
         'user': 'api.serializers.UserSerializer',
         'current_user': 'api.serializers.UserSerializer',
     },
@@ -144,10 +141,6 @@ DJOSER = {
         'current_user': ['rest_framework.permissions.IsAuthenticated'],
     }
 }
-
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = '/backend_send_emails/send_emails'
-DEFAULT_FROM_EMAIL = 'yamdb@example.com'
 
 CSRF_TRUSTED_ORIGINS = [
     'https://onov.ddns.net'

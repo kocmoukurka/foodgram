@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
 
-from api.views import redirect_short_link
+from recipes.views import redirect_short_link
 
 urlpatterns = [
     path('admin/', admin.site.urls),

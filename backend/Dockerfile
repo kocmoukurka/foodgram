@@ -18,7 +18,6 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
-CMD ["gunicorn", \
-    "--bind", "0.0.0.0:8000", \
-    "foodgram.wsgi"]
+
+CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0.0.0.0:8000"]
     

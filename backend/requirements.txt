@@ -34,3 +34,4 @@ social-auth-core==4.7.0
 sqlparse==0.5.3
 tzdata==2025.2
 urllib3==2.5.0
+drf-extra-fields==3.7.0

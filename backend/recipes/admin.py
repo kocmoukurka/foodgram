@@ -1,45 +1,16 @@
-from django.forms import BaseInlineFormSet
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from django.core.exceptions import ValidationError
-from recipes.models import (
-    Tag,
-    Ingredient,
-    Recipe,
-    IngredientInRecipe,
+
+from .models import (
     Favorite,
-    ShoppingCart
+    Ingredient,
+    IngredientInRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag,
 )
 
 admin.site.unregister(Group)
-
-
-class IngredientInRecipeInlineFormSet(BaseInlineFormSet):
-    def clean(self):
-        super().clean()
-
-        has_valid_ingredients = False
-        valid_forms_count = 0
-
-        for form in self.forms:
-            if form.cleaned_data and not form.cleaned_data.get('DELETE',
-                                                               False):
-                amount = form.cleaned_data.get('amount', 0)
-                ingredient = form.cleaned_data.get('ingredient')
-
-                if amount > 0 and ingredient is not None:
-                    has_valid_ingredients = True
-                    valid_forms_count += 1
-
-        if not has_valid_ingredients:
-            raise ValidationError(
-                'Рецепт должен содержать хотя бы один ингредиент.'
-            )
-
-        if valid_forms_count == 0:
-            raise ValidationError(
-                'Добавьте хотя бы один ингредиент с количеством больше 0.'
-            )
 
 
 class IngredientInRecipeInline(admin.TabularInline):
@@ -47,7 +18,6 @@ class IngredientInRecipeInline(admin.TabularInline):
     extra = 1
     min_num = 1
     autocomplete_fields = ('ingredient',)
-    formset = IngredientInRecipeInlineFormSet
 
 
 @admin.register(Tag)
@@ -65,7 +35,8 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author', 'created', 'get_favorites_count')
+    list_display = ('name', 'author', 'created', 'get_favorite_count',
+                    'get_tags', 'get_ingredients')
     search_fields = ('name', 'author__username', 'tags__name')
     list_filter = ('tags', 'created')
     filter_horizontal = ('tags',)
@@ -74,17 +45,26 @@ class RecipeAdmin(admin.ModelAdmin):
     autocomplete_fields = ('author', 'tags')
     exclude = ('short_link_code',)
     inlines = (IngredientInRecipeInline,)
+    readonly_fields = ('short_link_code',)
 
-    def get_favorites_count(self, obj):
-        return obj.favorites.count()
-    get_favorites_count.short_description = 'В избранном'
-    get_favorites_count.admin_order_field = 'favorites__count'
+    @admin.display(description='В избранном', ordering='favorite__count')
+    def get_favorite_count(self, obj):
+        return obj.favorite.count()
 
-    def get_readonly_fields(self, request, obj=None):
-        # Запрещаем изменение ID короткого линка после создания
-        if obj:
-            return ('id', 'created', 'short_link_code')
-        return ()
+    @admin.display(description='Теги')
+    def get_tags(self, obj):
+        """
+        Возвращает строку с тегами через запятую.
+        """
+        return ', '.join(tag.name for tag in obj.tags.all())
+
+    @admin.display(description='Ингредиенты')
+    def get_ingredients(self, obj):
+        """
+        Возвращает строку с ингредиентами через запятую.
+        """
+        return ', '.join(
+            str(ingredient) for ingredient in obj.ingredients.all())
 
 
 @admin.register(IngredientInRecipe)
