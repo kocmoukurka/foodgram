@@ -55,7 +55,6 @@ Foodgram - это fullstack-приложение, позволяющее:
 - DEBUG=False django
 - CHOICE_DB=False django
 - ALLOWED_HOSTS=ALLOWED_HOSTS django
-- FRONTEND_URL= URl вашего сайта
 
 ## Запуск проекта:
 ```bash
