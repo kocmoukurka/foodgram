@@ -149,7 +149,7 @@ class Recipe(models.Model):
 
 class IngredientInRecipe(models.Model):
     """Связывающая модель для связи рецепта с ингредиентом."""
-    
+
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -207,8 +207,8 @@ class AbstractUserRecipeRelation(models.Model):
 
     def __str__(self):
         """Форматированный вывод"""
-        return f'{self.user.username} {
-            self._meta.verbose_name.lower()} {self.recipe.name}'
+        return (f'{self.user.username}'
+                f'{self._meta.verbose_name.lower()} {self.recipe.name}')
 
 
 class Favorite(AbstractUserRecipeRelation):

@@ -61,14 +61,14 @@ class RecipeViewSet(ModelViewSet):
 
     def generate_txt(self, items, user):
         """ Упрощенная версия генератора файла."""
-        
+
         content = 'Список покупок:\n\n'
         content += '=' * 40 + '\n\n'
 
         for item in items:
-            content += (f'• {item['ingredient__name']} - '
-                        f'{item['total_amount']}'
-                        f' {item['ingredient__measurement_unit']}\n')
+            content += (f'• {item["ingredient__name"]} - '
+                        f'{item["total_amount"]}'
+                        f' {item["ingredient__measurement_unit"]}\n')
 
         content += '\n' + '=' * 40 + '\n'
         content += f'Приятных покупок, {user.first_name or user.username}!'

@@ -297,7 +297,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
     """Упрощённый сериализатор для представления короткого вида рецепта."""
-    
+
     image = serializers.SerializerMethodField()
 
     class Meta:
