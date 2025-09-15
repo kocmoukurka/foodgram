@@ -1,4 +1,3 @@
-
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -8,9 +7,9 @@ from .constants import (
     MAX_INGREDIENT_NAME_LENGTH,
     MAX_RECIPE_NAME_LENGTH,
     MAX_TAG_NAME_SLUG_LENGTH,
-    MINVALUEVALIDATOR
+    MAX_NAME_RETURN,
+    MIN_VALUE
 )
-
 from .services import generate_short_link_code
 
 User = get_user_model()
@@ -39,7 +38,7 @@ class Tag(models.Model):
 
     def __str__(self):
         """Строковое представление экземпляра."""
-        return self.name[:20]
+        return self.name[:MAX_NAME_RETURN]
 
 
 class Ingredient(models.Model):
@@ -70,7 +69,7 @@ class Ingredient(models.Model):
 
     def __str__(self):
         """Строковое представление экземпляра."""
-        return self.name
+        return self.name[:MAX_NAME_RETURN]
 
 
 class Recipe(models.Model):
@@ -95,7 +94,7 @@ class Recipe(models.Model):
     text = models.TextField('Описание', help_text='Описание рецепта.')
     cooking_time = models.PositiveIntegerField(
         'Время приготовления',
-        validators=(MinValueValidator(MINVALUEVALIDATOR),),
+        validators=(MinValueValidator(MIN_VALUE),),
         help_text='Продолжительность готовки в минутах.',
     )
     tags = models.ManyToManyField(
@@ -144,7 +143,7 @@ class Recipe(models.Model):
 
     def __str__(self):
         """Строковое представление экземпляра."""
-        return self.name
+        return self.name[:MAX_NAME_RETURN]
 
 
 class IngredientInRecipe(models.Model):
@@ -163,13 +162,13 @@ class IngredientInRecipe(models.Model):
     )
     amount = models.PositiveIntegerField(
         'Количество',
-        validators=(MinValueValidator(MINVALUEVALIDATOR),),
+        validators=(MinValueValidator(MIN_VALUE),),
     )
 
     class Meta:
         constraints = (
             models.UniqueConstraint(
-                fields=['recipe', 'ingredient'],
+                fields=('recipe', 'ingredient'),
                 name='unique_ingredient_in_recipe'
             ),
         )
@@ -202,7 +201,12 @@ class AbstractUserRecipeRelation(models.Model):
 
     class Meta:
         abstract = True
-        unique_together = (('user', 'recipe'),)
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_%(class)s'
+            ),
+        )
         ordering = ('user',)
 
     def __str__(self):

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from users.constants import (
@@ -59,13 +60,13 @@ class Subscribe(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subscribers',
+        related_name='user_subscriptions',
         verbose_name='Кто подписался'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subscriptions',
+        related_name='subscriptions_author',
         verbose_name='На кого подписался'
     )
 
@@ -79,6 +80,10 @@ class Subscribe(models.Model):
             ),
         )
         ordering = ('user',)
+
+    def clean(self):
+        if self.user == self.author:
+            raise ValidationError('Нельзя подписаться на самого себя')
 
     def __str__(self):
         return f'{self.user} подписался на {self.author}'
