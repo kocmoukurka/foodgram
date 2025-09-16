@@ -33,9 +33,11 @@ class UserSerializer(UserSerializer):
         """Проверяет, подписан ли текущий пользователь на этого автора."""
 
         request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            return obj.user_subscriptions.filter(user=request.user).exists()
-        return False
+        return (
+            request
+            and request.user.is_authenticated
+            and obj.user_subscriptions.filter(user=request.user).exists()
+        )
 
 
 class SubscriptionSerializer(UserSerializer):
@@ -84,7 +86,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
                 {'error': 'Нельзя подписаться на самого себя'}
             )
 
-        if author.subscriptions_author.filter(user=user).exists():
+        if author.subscriptions_to_author.filter(user=user).exists():
             raise serializers.ValidationError(
                 {'error': 'Вы уже подписаны на этого пользователя'}
             )
@@ -207,13 +209,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 'Необходимо указать хотя бы один тег.'
             )
 
-        seen_ids = set()
-        for tag in value:
-            if tag.id in seen_ids:
-                raise serializers.ValidationError(
-                    'Теги не должны повторяться.'
-                )
-            seen_ids.add(tag.id)
+        if len(value) != len(set(value)):
+            raise serializers.ValidationError(
+                'Теги не должны повторяться.'
+            )
 
         return value
 
@@ -293,11 +292,11 @@ class AbstractUserRecipeCreateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         user = attrs.get('user')
         recipe = attrs.get('recipe')
+        model = self.Meta.model
 
-        if self.Meta.model.objects.filter(user=user, recipe=recipe).exists():
+        if model.objects.filter(user=user, recipe=recipe).exists():
             raise serializers.ValidationError(
-                f'{self.Meta.model._meta.verbose_name.capitalize()}'
-                f' уже добавлено.'
+                f'{model._meta.verbose_name.capitalize()} уже добавлено.'
             )
 
         return attrs

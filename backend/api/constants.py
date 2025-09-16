@@ -1,1 +1,0 @@
-MINVALUE = 1

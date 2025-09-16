@@ -46,11 +46,7 @@ class RecipeFilter(django_filters.FilterSet):
 
         user = getattr(self.request, 'user', None)
         if value and user and user.is_authenticated:
-            value_int = int(value)
-            if value_int == 1:
-                return queryset.filter(shoppingcart__user=user)
-            elif value_int == 0:
-                return queryset.exclude(shoppingcart__user=user)
+            return queryset.filter(shoppingcart__user=user)
         return queryset
 
 

@@ -81,8 +81,10 @@ class RecipeViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = Recipe.objects.select_related(
-            'author').prefetch_related('tags', 'ingredients',
-                                       'recipe_ingredients__ingredient')
+            'author'
+        ).prefetch_related(
+            'tags', 'ingredients', 'recipe_ingredients__ingredient'
+        )
 
         if self.request.user.is_authenticated:
             user = self.request.user
@@ -136,7 +138,7 @@ class RecipeViewSet(ModelViewSet):
         return Response({'short-link': short_link})
 
     @action(methods=('get',), detail=False, url_path='download_shopping_cart',
-            permission_classes=[IsAuthenticated])
+            permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request):
         user = request.user
         shopping_list = IngredientInRecipe.objects.filter(
@@ -156,7 +158,7 @@ class RecipeViewSet(ModelViewSet):
         return RecipeViewSet.generate_txt(shopping_list, user)
 
     @action(methods=('post',), detail=True, url_path='shopping_cart',
-            permission_classes=[IsAuthenticated])
+            permission_classes=(IsAuthenticated,))
     def shopping_cart(self, request, pk=None):
         return self.add_to_collection(
             create_serializer_class=ShoppingCartCreateSerializer, pk=pk)
@@ -172,12 +174,12 @@ class RecipeViewSet(ModelViewSet):
         ).delete()
 
         return Response(
-            status=status.HTTP_204_NO_CONTENT if deleted_count > 0
+            status=status.HTTP_204_NO_CONTENT if deleted_count
             else status.HTTP_400_BAD_REQUEST
         )
 
     @action(methods=('post',), detail=True, url_path='favorite',
-            permission_classes=[IsAuthenticated])
+            permission_classes=(IsAuthenticated,))
     def favorite(self, request, pk=None):
         return self.add_to_collection(
             create_serializer_class=FavoriteCreateSerializer, pk=pk)
@@ -193,7 +195,7 @@ class RecipeViewSet(ModelViewSet):
         ).delete()
 
         return Response(
-            status=status.HTTP_204_NO_CONTENT if deleted_count > 0
+            status=status.HTTP_204_NO_CONTENT if deleted_count
             else status.HTTP_400_BAD_REQUEST
         )
 
@@ -240,8 +242,7 @@ class UserViewSet(DjoserUserViewSet):
     @avatar.mapping.delete
     def delete_avatar(self, request):
         user = request.user
-        user.avatar.delete(save=False)
-        user.save()
+        user.avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=('post',), detail=True, url_path='subscribe')
@@ -268,14 +269,14 @@ class UserViewSet(DjoserUserViewSet):
         ).delete()
 
         return Response(
-            status=status.HTTP_204_NO_CONTENT if deleted_count > 0
+            status=status.HTTP_204_NO_CONTENT if deleted_count
             else status.HTTP_400_BAD_REQUEST
         )
 
     @action(methods=('get',), detail=False, url_path='subscriptions')
     def subscriptions(self, request):
         authors = User.objects.filter(
-            subscriptions_author__user=request.user
+            subscriptions_to_author__user=request.user
         ).annotate(
             recipes_count=Count('recipes')
         ).order_by('username')
