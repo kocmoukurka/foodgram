@@ -71,3 +71,6 @@ Foodgram - это fullstack-приложение, позволяющее:
 GitHub: @kocmoukurka
 ФИО Шаронов И.С.
 
+## URL
+onov.ddns.net
+
