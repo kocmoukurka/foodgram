@@ -168,13 +168,13 @@ class RecipeViewSet(ModelViewSet):
         """Удаляет рецепт из списка покупок пользователя."""
 
         get_object_or_404(Recipe, id=pk)
-        deleted_count, _ = ShoppingCart.objects.filter(
+        deleted, _ = ShoppingCart.objects.filter(
             user=request.user,
             recipe_id=pk
         ).delete()
 
         return Response(
-            status=status.HTTP_204_NO_CONTENT if deleted_count
+            status=status.HTTP_204_NO_CONTENT if deleted
             else status.HTTP_400_BAD_REQUEST
         )
 
@@ -189,13 +189,13 @@ class RecipeViewSet(ModelViewSet):
         """Удаляет рецепт из избранного пользователя."""
 
         get_object_or_404(Recipe, id=pk)
-        deleted_count, _ = Favorite.objects.filter(
+        deleted, _ = Favorite.objects.filter(
             user=request.user,
             recipe_id=pk
         ).delete()
 
         return Response(
-            status=status.HTTP_204_NO_CONTENT if deleted_count
+            status=status.HTTP_204_NO_CONTENT if deleted
             else status.HTTP_400_BAD_REQUEST
         )
 
@@ -264,12 +264,12 @@ class UserViewSet(DjoserUserViewSet):
         author = get_object_or_404(User, pk=id)
         user = request.user
 
-        deleted_count, _ = Subscribe.objects.filter(
+        deleted, _ = Subscribe.objects.filter(
             user=user, author=author
         ).delete()
 
         return Response(
-            status=status.HTTP_204_NO_CONTENT if deleted_count
+            status=status.HTTP_204_NO_CONTENT if deleted
             else status.HTTP_400_BAD_REQUEST
         )
 

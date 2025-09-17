@@ -33,11 +33,15 @@ class UserSerializer(UserSerializer):
         """Проверяет, подписан ли текущий пользователь на этого автора."""
 
         request = self.context.get('request')
-        return (
+
+        result = (
             request
             and request.user.is_authenticated
-            and obj.user_subscriptions.filter(user=request.user).exists()
+            and obj.subscriptions_to_author.filter(user=request.user).exists()
         )
+
+        print(f"Is subscribed result: {result}")
+        return result
 
 
 class SubscriptionSerializer(UserSerializer):
